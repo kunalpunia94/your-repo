@@ -3,7 +3,7 @@ name: Deploy to AWS EC2
 on:
   push:
     branches:
-      - main  # This triggers the workflow on push to main branch
+      - main  # This triggers the workflow on push to the main branch
 
 jobs:
   deploy:
@@ -11,29 +11,47 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Verify Code Checkout
+      run: ls -la  # Debugging step to check if package.json is present
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: '20'  # Updated to Node.js 20 for better compatibility
 
     - name: Install Dependencies
       run: npm install
+      working-directory: ./  # Change this if your package.json is inside a subfolder
 
     - name: Run Unit Tests
       run: npm test
+      working-directory: ./  # Ensure correct directory
 
     - name: Run Integration Tests
       run: npm run test:integration
+      working-directory: ./
+
+    - name: Install Docker (If Not Installed)
+      run: |
+        if ! command -v docker &> /dev/null; then
+          echo "Docker not found, installing..."
+          curl -fsSL https://get.docker.com | sh
+          sudo usermod -aG docker $USER
+        else
+          echo "Docker already installed"
+        fi
 
     - name: Build Docker Image
       run: docker build -t my-html-app .
 
     - name: Stop and Remove Old Container
       run: |
-        docker stop my-html-container || true
-        docker rm my-html-container || true
+        if docker ps -q -f name=my-html-container; then
+          docker stop my-html-container
+          docker rm my-html-container
+        fi
 
     - name: Run New Container
       run: docker run -d -p 8080:80 --name my-html-container my-html-app
