@@ -6,8 +6,26 @@ on:
       - main
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+
+      - name: Run Unit Tests
+        run: bash tests/unit_test.sh
+
+      - name: Run Integration Tests
+        run: bash tests/integration_test.sh
+
   deploy:
-    runs-on: self-hosted # Using EC2 as a self-hosted runner
+    runs-on: self-hosted  # Runs on your EC2 instance
+    needs: test  # Deploy only if tests pass
 
     steps:
       - name: Checkout Code
@@ -18,8 +36,10 @@ jobs:
 
       - name: Stop and Remove Old Container
         run: |
-          docker stop my-html-container || true
-          docker rm my-html-container || true
+          if docker ps -q -f name=my-html-container; then
+            docker stop my-html-container
+            docker rm my-html-container
+          fi
 
       - name: Run New Container
         run: docker run -d -p 8080:80 --name my-html-container my-html-app
