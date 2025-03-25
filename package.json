@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Simple HTML test project with Nginx",
   "scripts": {
-    "test": "mocha test/unit.test.js",  
+    "test": "mocha tests/unit.test.js",  
     "test:integration": "mocha test/integration.test.js"
   },
   "devDependencies": {
