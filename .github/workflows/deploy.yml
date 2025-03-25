@@ -22,4 +22,4 @@ jobs:
           docker rm my-html-container || true
 
       - name: Run New Container
-        run: docker run -d -p 80:80 --name my-html-container my-html-app
+        run: docker run -d -p 8080:80 --name my-html-container my-html-app
