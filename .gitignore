@@ -1,12 +1,5 @@
-# Ignore node_modules folder
+# Ignore node_modules folder (for testing purposes)
 node_modules/
 
-# Ignore .env files
-.env
-
-# Ignore log files
+# Ignore Dockerfile build artifacts
 *.log
-
-# Ignore OS files
-.DS_Store
-Thumbs.db
